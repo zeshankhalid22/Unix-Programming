@@ -4,52 +4,60 @@
 #include <unistd.h>
 #include <string.h>
 
+#define BUFSIZE 100
+
 int main() {
     int client_to_server;
-    char *myfifo = "/tmp/client_to_server_fifo";
+    char *to_server = "/tmp/client_to_server_fifo";
 
     int server_to_client;
-    char *myfifo2 = "/tmp/server_to_client_fifo";
+    char *to_client = "/tmp/server_to_client_fifo";
 
-    char buf[BUFSIZ];
+    char op;
     int num1, num2;
 
     /* create the FIFO (named pipe) */
-    mkfifo(myfifo, 0666);
-    mkfifo(myfifo2, 0666);
+    mkfifo(to_server, 0666);
+    mkfifo(to_client, 0666);
 
-
-    printf("Server ON.\n");
+    printf("Server ON.\n...\n");
 
     while (1) {
-        /* open, read, and display the message from the FIFO */
-        // open myfifo in read-mode, wait until we can't open
-        client_to_server = open(myfifo, O_RDONLY);
-        server_to_client = open(myfifo2, O_WRONLY);
-        // read data from client_to_server(fd) to > buf[]
-        read(client_to_server, buf, BUFSIZ);
+        // open client_to_server(client request) pipe in Read Mode
+        client_to_server = open(to_server, O_RDONLY);
+        // open server_to_client( server response) in write mode
+        server_to_client = open(to_client, O_WRONLY);
+
+        // Read Request from Client
+        read(client_to_server, &op, sizeof(op));
         read(client_to_server, &num1, sizeof(num1));
         read(client_to_server, &num2, sizeof(num2));
 
-        if (strcmp("exit", buf) == 0) {
+        if (op == 'q') {
             printf("Server OFF.\n");
             break;
-        } else if (strcmp("", buf) != 0) {
-            printf("Received: %s\n", buf);
-            printf("Also Received  %d, %d\n", num1, num2);
-            printf("Sending back the sum...\n");
-            int sum = num1 + num2;
-            write(server_to_client, &sum, sizeof(sum));
         }
-
-        /* clean buf from any data */
-        memset(buf, 0, sizeof(buf));
+        else {
+            printf("Client Requested: %d %c %d ?\n", num1, op, num2);
+            printf("Responding ...\n");
+            int result;
+            switch (op) {
+                case '+': result = num1 + num2; break;
+                case '-': result = num1 - num2; break;
+                case '*': result = num1 * num2; break;
+                case '/': result = num1 / num2; break;
+                case '%': result = num1 % num2; break;
+                default:  result = -1;
+            }
+            // send response back to client
+            write(server_to_client, &result, sizeof(result));
+        }
     }
 
     close(client_to_server);
     close(server_to_client);
 
-    unlink(myfifo);
-    unlink(myfifo2);
+    unlink(to_server);
+    unlink(to_client);
     return 0;
 }
