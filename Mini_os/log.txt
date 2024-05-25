@@ -1,0 +1,54 @@
+Process 1 added to the priority queue at 22:40:08
+Process 5 added to the priority queue at 22:40:13
+Process 8 added to the priority queue at 22:40:23
+Process 5 started running at 22:40:27
+Process 5 finished running at 22:40:27
+Process 8 started running at 22:40:27
+Process 8 finished running at 22:40:27
+Process 1 started running at 22:41:14
+Process 1 finished running at 22:41:14
+Process 1 finished running at 22:41:14
+Process 7 added to the priority queue at 22:42:24
+Process 9 added to the priority queue at 22:42:28
+Process 2 added to the priority queue at 22:42:45
+Process 7 started running at 22:43:46
+Process 7 finished running at 22:43:46
+Process 9 started running at 22:43:46
+Process 9 finished running at 22:43:46
+Process 2 started running at 22:44:10
+Process 2 finished running at 22:44:10
+Process 3 added to the priority queue at 22:53:08
+Process 3 started running at 22:53:10
+Process 3 finished running at 22:53:10
+Process 2 added to the priority queue at 12:23:38
+Process 3 added to the priority queue at 13:21:36
+Process 3 started running at 13:21:38
+Process 3 finished running at 13:21:38
+Process 1 added to the priority queue at 13:22:34
+Process 1 started running at 13:22:35
+Process 1 finished running at 13:22:35
+Process 1 finished running at 13:22:35
+Process 2 added to the priority queue at 13:23:49
+Process 4 added to the priority queue at 13:23:54
+Process 9 added to the priority queue at 13:23:59
+Process 7 added to the priority queue at 13:24:04
+Process 1 added to the priority queue at 13:24:43
+Process 1 started running at 13:24:44
+Process 1 finished running at 13:24:44
+Process 1 finished running at 13:24:44
+Process 9 added to the priority queue at 13:25:01
+Process 2 added to the priority queue at 13:25:22
+Process 7 added to the priority queue at 13:25:26
+Process 9 added to the priority queue at 13:25:31
+Process 7 started running at 13:25:32
+Process 9 started running at Process 7 finished running at 13:25:32
+Process 9 finished running at 13:25:32
+13:25:32
+Process 2 started running at 13:26:11
+Process 2 finished running at 13:26:11
+Process 2 added to the priority queue at 21:48:26
+Process 2 started running at 21:48:29
+Process 2 finished running at 21:48:29
+Process 3 added to the priority queue at 22:09:46
+Process 3 started running at 22:09:49
+Process 3 finished running at 22:09:49
