@@ -1,61 +1,76 @@
+#include <iostream>
 #include <sys/mman.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <string.h>
-#include <stdio.h>
+#include <unistd.h>
+#include <sys/stat.h>
+
+using namespace std;
+
+#define PAGESIZE 4096
 
 int main() {
-    int fd = open("data.txt", O_RDWR, S_IRUSR | S_IWUSR);
+    int numPages;
+    int fd;
+
+    cout << "How many Pages you wanna allocate > ";
+    cin >> numPages;
+
+    // Open a file
+    fd = open("data.txt", O_RDWR, S_IRUSR | S_IWUSR);
     if (fd == -1) {
-        perror("Error opening file.\n");
+        perror("Error opening file");
         return -1;
     }
 
-
-    // get size of file using fstat
+    // Get the size of the file
     struct stat st;
     if (fstat(fd, &st) == -1) {
-        close(fd);
         perror("Error getting file size");
-        return -1;
-    }
-
-    int num_elements = st.st_size / sizeof(int);
-
-    int *map = mmap(NULL, st.st_size , PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
-    if (map == MAP_FAILED) {
         close(fd);
-        perror("Error mmapping the file");
         return -1;
     }
 
-    printf("Before updating...\n");
-    for (int i = 0; i < num_elements; i++) {
-        printf("%d ", map[i]);
-    }
-    // multiply data in mapped region with 2
-    for (int i = 0; i < num_elements; i++) {
-        map[i] = map[i] * 2;
-    }
-    printf("\nAfter updating data...\n");
-    for (int i = 0; i < num_elements; i++) {
-        printf("%d ", map[i]);
-    }
-    printf("\n");
-
-    // sync changes on disk
-    if (msync(map, st.st_size, MS_SYNC) == -1) {
-        perror("Error syncing file to disk.\n");
+    // Determine the size of the needed mapping
+    size_t mappingSize = st.st_size;
+    if (mappingSize < numPages * PAGESIZE) {
+        mappingSize = numPages * PAGESIZE;
     }
 
-    // free mapped region
-    if (munmap(map, st.st_size) == -1) {
-        perror("Error un-mapping.\n");
+    // Create a mapping in the process's virtual memory space
+    void *ret_addr = mmap(NULL, mappingSize, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    printf("Allocated %d pages (%d bytes) from address %p\n", numPages, numPages * PAGESIZE, ret_addr);
+    char *addr = static_cast<char *>(ret_addr);
+
+    if (addr == MAP_FAILED) {
+        // if We are unable to map memory
+        perror("mmap");
+        close(fd);
+        return -1;
+    }
+
+    cout << "Before Changes: " << addr << endl;
+    // move to next digit
+    for (int i = 0; i < st.st_size; i++) {
+        // changes are happening in mapped region in
+        // virtual addresses space
+        addr[i] = addr[i] + 1;
+    }
+    cout << "After changes: " << addr << endl;
+
+    // Write any changes made to the mapped memory
+    // back to the file on disk
+    if (msync(addr, numPages * PAGESIZE, MS_SYNC) == -1) {
+        perror("msync");
+    }
+
+    // Free up the memory
+    if (munmap(addr, numPages * PAGESIZE) == -1) {
+        perror("munmap");
     }
 
     close(fd);
+    cout << endl;
 
     return 0;
 }
